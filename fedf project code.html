@@ -1,0 +1,794 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProConnect - Find & Hire Professionals</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .star-rating {
+            color: #fbbf24;
+        }
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-full">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="text-2xl font-bold text-blue-600">ProConnect</div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="showSection('browse')" class="text-gray-700 hover:text-blue-600 transition-colors">Browse Services</button>
+                    <button onclick="showSection('how-it-works')" class="text-gray-700 hover:text-blue-600 transition-colors">How It Works</button>
+                    <button onclick="showSection('become-pro')" class="text-gray-700 hover:text-blue-600 transition-colors">Become a Pro</button>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showLoginModal()" class="text-gray-700 hover:text-blue-600 transition-colors">Sign In</button>
+                    <button onclick="showSignupModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">Join Now</button>
+                    <button onclick="toggleUserMenu()" class="relative">
+                        <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium">👤</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenu" class="hidden absolute right-4 top-16 bg-white rounded-lg shadow-lg border z-50 w-48">
+        <div class="py-2">
+            <button onclick="switchRole('user')" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">👤 User Dashboard</button>
+            <button onclick="switchRole('professional')" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">💼 Professional Dashboard</button>
+            <button onclick="switchRole('admin')" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">⚙️ Admin Panel</button>
+            <button onclick="switchRole('support')" class="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors">🎧 Support Center</button>
+            <hr class="my-2">
+            <button onclick="logout()" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600 transition-colors">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Home Section -->
+        <section id="home" class="text-center mb-16">
+            <h1 class="text-5xl font-bold text-gray-900 mb-6">Find the Perfect Professional for Any Job</h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">Connect with trusted professionals in your area. From home repairs to business consulting, find the right expert for your needs.</p>
+            
+            <!-- Search Bar -->
+            <div class="max-w-4xl mx-auto mb-12">
+                <div class="flex flex-col md:flex-row gap-4 bg-white p-6 rounded-2xl shadow-lg">
+                    <div class="flex-1">
+                        <input type="text" id="serviceSearch" placeholder="What service do you need?" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="flex-1">
+                        <input type="text" id="locationSearch" placeholder="Enter your location" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <button onclick="searchProfessionals()" class="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold">Search</button>
+                </div>
+            </div>
+
+            <!-- Service Categories -->
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-16">
+                <div onclick="filterByCategory('home-improvement')" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="text-3xl mb-3">🔨</div>
+                    <h3 class="font-semibold text-gray-900">Home Improvement</h3>
+                </div>
+                <div onclick="filterByCategory('cleaning')" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="text-3xl mb-3">🧹</div>
+                    <h3 class="font-semibold text-gray-900">Cleaning</h3>
+                </div>
+                <div onclick="filterByCategory('tech')" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="text-3xl mb-3">💻</div>
+                    <h3 class="font-semibold text-gray-900">Tech Support</h3>
+                </div>
+                <div onclick="filterByCategory('tutoring')" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="text-3xl mb-3">📚</div>
+                    <h3 class="font-semibold text-gray-900">Tutoring</h3>
+                </div>
+                <div onclick="filterByCategory('fitness')" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="text-3xl mb-3">💪</div>
+                    <h3 class="font-semibold text-gray-900">Fitness</h3>
+                </div>
+                <div onclick="filterByCategory('business')" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                    <div class="text-3xl mb-3">💼</div>
+                    <h3 class="font-semibold text-gray-900">Business</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Browse Section -->
+        <section id="browse" class="hidden">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Browse Professionals</h2>
+                <div class="flex gap-4">
+                    <select id="sortBy" onchange="sortProfessionals()" class="p-3 border border-gray-300 rounded-lg">
+                        <option value="rating">Sort by Rating</option>
+                        <option value="price">Sort by Price</option>
+                        <option value="reviews">Sort by Reviews</option>
+                    </select>
+                    <select id="filterCategory" onchange="filterProfessionals()" class="p-3 border border-gray-300 rounded-lg">
+                        <option value="">All Categories</option>
+                        <option value="home-improvement">Home Improvement</option>
+                        <option value="cleaning">Cleaning</option>
+                        <option value="tech">Tech Support</option>
+                        <option value="tutoring">Tutoring</option>
+                        <option value="fitness">Fitness</option>
+                        <option value="business">Business</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Professionals Grid -->
+            <div id="professionalsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Professional cards will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- User Dashboard -->
+        <section id="userDashboard" class="hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Your Dashboard</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Active Bookings -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-6">Active Bookings</h3>
+                        <div id="activeBookings" class="space-y-4">
+                            <!-- Bookings will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-6">Quick Actions</h3>
+                        <div class="space-y-4">
+                            <button onclick="showSection('browse')" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">Find Professionals</button>
+                            <button onclick="showBookingHistory()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Booking History</button>
+                            <button onclick="showFavorites()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Saved Professionals</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Professional Dashboard -->
+        <section id="professionalDashboard" class="hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Professional Dashboard</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">24</div>
+                    <div class="text-gray-600">Active Jobs</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">4.8</div>
+                    <div class="text-gray-600">Average Rating</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">156</div>
+                    <div class="text-gray-600">Total Reviews</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">$2,340</div>
+                    <div class="text-gray-600">This Month</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Recent Inquiries -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-6">Recent Inquiries</h3>
+                        <div id="professionalInquiries" class="space-y-4">
+                            <!-- Inquiries will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Management -->
+                <div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-6">Profile Management</h3>
+                        <div class="space-y-4">
+                            <button onclick="editProfile()" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">Edit Profile</button>
+                            <button onclick="manageServices()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Manage Services</button>
+                            <button onclick="viewAnalytics()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">View Analytics</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section id="adminPanel" class="hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Admin Panel</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">1,247</div>
+                    <div class="text-gray-600">Total Users</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600 mb-2">389</div>
+                    <div class="text-gray-600">Active Professionals</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">2,156</div>
+                    <div class="text-gray-600">Completed Jobs</div>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                    <div class="text-3xl font-bold text-orange-600 mb-2">$45,230</div>
+                    <div class="text-gray-600">Platform Revenue</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- User Management -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-6">User Management</h3>
+                    <div class="space-y-4">
+                        <button onclick="manageUsers()" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">Manage Users</button>
+                        <button onclick="manageProfessionals()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Manage Professionals</button>
+                        <button onclick="viewReports()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">View Reports</button>
+                    </div>
+                </div>
+
+                <!-- Platform Settings -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold mb-6">Platform Settings</h3>
+                    <div class="space-y-4">
+                        <button onclick="manageCategories()" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">Manage Categories</button>
+                        <button onclick="configurePayments()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Payment Settings</button>
+                        <button onclick="systemSettings()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">System Settings</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Support Center -->
+        <section id="supportCenter" class="hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8">Support Center</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Active Tickets -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-6">Active Support Tickets</h3>
+                        <div id="supportTickets" class="space-y-4">
+                            <!-- Tickets will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support Actions -->
+                <div>
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-xl font-semibold mb-6">Support Actions</h3>
+                        <div class="space-y-4">
+                            <button onclick="createTicket()" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors">Create New Ticket</button>
+                            <button onclick="viewKnowledgeBase()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Knowledge Base</button>
+                            <button onclick="escalateIssue()" class="w-full bg-gray-100 text-gray-700 p-3 rounded-lg hover:bg-gray-200 transition-colors">Escalate Issue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 slide-up">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Sign In</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+                    <input type="password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">Sign In</button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="closeModal('loginModal')" class="text-gray-500 hover:text-gray-700">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 slide-up">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Join ProConnect</h2>
+            <form onsubmit="handleSignup(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Full Name</label>
+                    <input type="text" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="email" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Password</label>
+                    <input type="password" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">I want to:</label>
+                    <select required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Select an option</option>
+                        <option value="hire">Hire professionals</option>
+                        <option value="offer">Offer my services</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">Create Account</button>
+            </form>
+            <div class="mt-4 text-center">
+                <button onclick="closeModal('signupModal')" class="text-gray-500 hover:text-gray-700">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Profile Modal -->
+    <div id="profileModal" class="hidden fixed inset-0 bg-black bg-opacity-50 modal-backdrop z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 slide-up max-h-[90vh] overflow-y-auto">
+            <div id="profileContent">
+                <!-- Profile content will be populated by JavaScript -->
+            </div>
+            <div class="mt-6 flex gap-4">
+                <button onclick="contactProfessional()" class="flex-1 bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold">Contact Professional</button>
+                <button onclick="hireProfessional()" class="flex-1 bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition-colors font-semibold">Hire Now</button>
+                <button onclick="closeModal('profileModal')" class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const professionals = [
+            {
+                id: 1,
+                name: "Sarah Johnson",
+                category: "home-improvement",
+                service: "Interior Design",
+                rating: 4.9,
+                reviews: 127,
+                price: "$75/hour",
+                location: "New York, NY",
+                image: "👩‍🎨",
+                description: "Professional interior designer with 8+ years of experience in residential and commercial spaces.",
+                skills: ["Space Planning", "Color Theory", "3D Visualization"],
+                availability: "Available this week"
+            },
+            {
+                id: 2,
+                name: "Mike Chen",
+                category: "tech",
+                service: "Computer Repair",
+                rating: 4.8,
+                reviews: 89,
+                price: "$60/hour",
+                location: "San Francisco, CA",
+                image: "👨‍💻",
+                description: "Certified technician specializing in hardware repairs and software troubleshooting.",
+                skills: ["Hardware Repair", "Software Installation", "Network Setup"],
+                availability: "Available today"
+            },
+            {
+                id: 3,
+                name: "Emily Rodriguez",
+                category: "cleaning",
+                service: "House Cleaning",
+                rating: 4.9,
+                reviews: 203,
+                price: "$40/hour",
+                location: "Los Angeles, CA",
+                image: "👩‍🔧",
+                description: "Professional cleaning service with eco-friendly products and flexible scheduling.",
+                skills: ["Deep Cleaning", "Eco-Friendly", "Move-in/Move-out"],
+                availability: "Available tomorrow"
+            },
+            {
+                id: 4,
+                name: "David Park",
+                category: "tutoring",
+                service: "Math Tutoring",
+                rating: 4.7,
+                reviews: 156,
+                price: "$50/hour",
+                location: "Chicago, IL",
+                image: "👨‍🏫",
+                description: "Mathematics professor with expertise in algebra, calculus, and test preparation.",
+                skills: ["Algebra", "Calculus", "SAT Prep"],
+                availability: "Available this week"
+            },
+            {
+                id: 5,
+                name: "Lisa Thompson",
+                category: "fitness",
+                service: "Personal Training",
+                rating: 4.8,
+                reviews: 94,
+                price: "$80/session",
+                location: "Miami, FL",
+                image: "👩‍💪",
+                description: "Certified personal trainer specializing in strength training and nutrition coaching.",
+                skills: ["Strength Training", "Nutrition", "Weight Loss"],
+                availability: "Available this week"
+            },
+            {
+                id: 6,
+                name: "Robert Kim",
+                category: "business",
+                service: "Business Consulting",
+                rating: 4.9,
+                reviews: 78,
+                price: "$150/hour",
+                location: "Seattle, WA",
+                image: "👨‍💼",
+                description: "Strategic business consultant helping startups and small businesses grow.",
+                skills: ["Strategy", "Marketing", "Operations"],
+                availability: "Available next week"
+            }
+        ];
+
+        let currentUser = null;
+        let currentRole = 'user';
+        let filteredProfessionals = [...professionals];
+
+        // Navigation functions
+        function showSection(sectionId) {
+            const sections = ['home', 'browse', 'userDashboard', 'professionalDashboard', 'adminPanel', 'supportCenter', 'how-it-works', 'become-pro'];
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+            
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.classList.add('fade-in');
+            }
+
+            if (sectionId === 'browse') {
+                displayProfessionals();
+            }
+        }
+
+        function switchRole(role) {
+            currentRole = role;
+            toggleUserMenu();
+            
+            switch(role) {
+                case 'user':
+                    showSection('userDashboard');
+                    loadUserDashboard();
+                    break;
+                case 'professional':
+                    showSection('professionalDashboard');
+                    loadProfessionalDashboard();
+                    break;
+                case 'admin':
+                    showSection('adminPanel');
+                    break;
+                case 'support':
+                    showSection('supportCenter');
+                    loadSupportTickets();
+                    break;
+            }
+        }
+
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Modal functions
+        function showLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function showSignupModal() {
+            document.getElementById('signupModal').classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            currentUser = { name: "John Doe", email: "john@example.com" };
+            closeModal('loginModal');
+            alert('Successfully signed in!');
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            currentUser = { name: "New User", email: "user@example.com" };
+            closeModal('signupModal');
+            alert('Account created successfully!');
+        }
+
+        function logout() {
+            currentUser = null;
+            showSection('home');
+            toggleUserMenu();
+        }
+
+        // Search and filter functions
+        function searchProfessionals() {
+            const service = document.getElementById('serviceSearch').value.toLowerCase();
+            const location = document.getElementById('locationSearch').value.toLowerCase();
+            
+            filteredProfessionals = professionals.filter(pro => {
+                const matchesService = !service || pro.service.toLowerCase().includes(service) || pro.category.includes(service);
+                const matchesLocation = !location || pro.location.toLowerCase().includes(location);
+                return matchesService && matchesLocation;
+            });
+            
+            showSection('browse');
+        }
+
+        function filterByCategory(category) {
+            filteredProfessionals = professionals.filter(pro => pro.category === category);
+            showSection('browse');
+        }
+
+        function filterProfessionals() {
+            const category = document.getElementById('filterCategory').value;
+            if (category) {
+                filteredProfessionals = professionals.filter(pro => pro.category === category);
+            } else {
+                filteredProfessionals = [...professionals];
+            }
+            displayProfessionals();
+        }
+
+        function sortProfessionals() {
+            const sortBy = document.getElementById('sortBy').value;
+            
+            filteredProfessionals.sort((a, b) => {
+                switch(sortBy) {
+                    case 'rating':
+                        return b.rating - a.rating;
+                    case 'price':
+                        return parseInt(a.price.replace(/\D/g, '')) - parseInt(b.price.replace(/\D/g, ''));
+                    case 'reviews':
+                        return b.reviews - a.reviews;
+                    default:
+                        return 0;
+                }
+            });
+            
+            displayProfessionals();
+        }
+
+        function displayProfessionals() {
+            const grid = document.getElementById('professionalsGrid');
+            grid.innerHTML = '';
+            
+            filteredProfessionals.forEach(pro => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer';
+                card.onclick = () => showProfessionalProfile(pro);
+                
+                card.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="text-4xl mr-4">${pro.image}</div>
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-900">${pro.name}</h3>
+                                <p class="text-gray-600">${pro.service}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center mb-3">
+                            <div class="flex text-yellow-400 mr-2">
+                                ${'★'.repeat(Math.floor(pro.rating))}${'☆'.repeat(5 - Math.floor(pro.rating))}
+                            </div>
+                            <span class="text-gray-600">${pro.rating} (${pro.reviews} reviews)</span>
+                        </div>
+                        <p class="text-gray-700 mb-4">${pro.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-blue-600">${pro.price}</span>
+                            <span class="text-sm text-gray-500">${pro.location}</span>
+                        </div>
+                        <div class="mt-4">
+                            <span class="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full">${pro.availability}</span>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function showProfessionalProfile(professional) {
+            const content = document.getElementById('profileContent');
+            content.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="text-6xl mb-4">${professional.image}</div>
+                    <h2 class="text-3xl font-bold text-gray-900">${professional.name}</h2>
+                    <p class="text-xl text-gray-600">${professional.service}</p>
+                    <p class="text-gray-500">${professional.location}</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Rating & Reviews</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400 mr-2">
+                                ${'★'.repeat(Math.floor(professional.rating))}${'☆'.repeat(5 - Math.floor(professional.rating))}
+                            </div>
+                            <span class="text-gray-600">${professional.rating} (${professional.reviews} reviews)</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Pricing</h3>
+                        <p class="text-2xl font-bold text-blue-600">${professional.price}</p>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">About</h3>
+                    <p class="text-gray-700">${professional.description}</p>
+                </div>
+                
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3">Skills & Expertise</h3>
+                    <div class="flex flex-wrap gap-2">
+                        ${professional.skills.map(skill => `<span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">${skill}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Availability</h3>
+                    <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full">${professional.availability}</span>
+                </div>
+            `;
+            
+            document.getElementById('profileModal').classList.remove('hidden');
+        }
+
+        function contactProfessional() {
+            alert('Message sent to professional! They will contact you soon.');
+            closeModal('profileModal');
+        }
+
+        function hireProfessional() {
+            alert('Booking request sent! The professional will confirm your appointment.');
+            closeModal('profileModal');
+        }
+
+        // Dashboard functions
+        function loadUserDashboard() {
+            const bookings = [
+                { id: 1, professional: "Sarah Johnson", service: "Interior Design Consultation", date: "Dec 15, 2024", status: "Confirmed" },
+                { id: 2, professional: "Mike Chen", service: "Computer Repair", date: "Dec 18, 2024", status: "Pending" }
+            ];
+            
+            const container = document.getElementById('activeBookings');
+            container.innerHTML = bookings.map(booking => `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${booking.service}</h4>
+                            <p class="text-gray-600">with ${booking.professional}</p>
+                            <p class="text-sm text-gray-500">${booking.date}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm ${booking.status === 'Confirmed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${booking.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadProfessionalDashboard() {
+            const inquiries = [
+                { id: 1, client: "John Smith", service: "Kitchen Renovation", date: "2 hours ago", status: "New" },
+                { id: 2, client: "Mary Johnson", service: "Living Room Design", date: "5 hours ago", status: "Responded" }
+            ];
+            
+            const container = document.getElementById('professionalInquiries');
+            container.innerHTML = inquiries.map(inquiry => `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${inquiry.service}</h4>
+                            <p class="text-gray-600">from ${inquiry.client}</p>
+                            <p class="text-sm text-gray-500">${inquiry.date}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm ${inquiry.status === 'New' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">${inquiry.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadSupportTickets() {
+            const tickets = [
+                { id: 1, user: "Alice Brown", issue: "Payment not processing", priority: "High", date: "1 hour ago" },
+                { id: 2, user: "Bob Wilson", issue: "Profile verification", priority: "Medium", date: "3 hours ago" }
+            ];
+            
+            const container = document.getElementById('supportTickets');
+            container.innerHTML = tickets.map(ticket => `
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-semibold text-gray-900">${ticket.issue}</h4>
+                            <p class="text-gray-600">from ${ticket.user}</p>
+                            <p class="text-sm text-gray-500">${ticket.date}</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-sm ${ticket.priority === 'High' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">${ticket.priority}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Placeholder functions for various actions
+        function showBookingHistory() { alert('Booking history feature coming soon!'); }
+        function showFavorites() { alert('Favorites feature coming soon!'); }
+        function editProfile() { alert('Profile editing feature coming soon!'); }
+        function manageServices() { alert('Service management feature coming soon!'); }
+        function viewAnalytics() { alert('Analytics feature coming soon!'); }
+        function manageUsers() { alert('User management feature coming soon!'); }
+        function manageProfessionals() { alert('Professional management feature coming soon!'); }
+        function viewReports() { alert('Reports feature coming soon!'); }
+        function manageCategories() { alert('Category management feature coming soon!'); }
+        function configurePayments() { alert('Payment configuration feature coming soon!'); }
+        function systemSettings() { alert('System settings feature coming soon!'); }
+        function createTicket() { alert('Ticket creation feature coming soon!'); }
+        function viewKnowledgeBase() { alert('Knowledge base feature coming soon!'); }
+        function escalateIssue() { alert('Issue escalation feature coming soon!'); }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const modals = ['loginModal', 'signupModal', 'profileModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+            
+            const userMenu = document.getElementById('userMenu');
+            if (!userMenu.contains(event.target) && !event.target.closest('button[onclick="toggleUserMenu()"]')) {
+                userMenu.classList.add('hidden');
+            }
+        });
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            displayProfessionals();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ba3fe0d2723d1e',t:'MTc1OTk3NDg2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
